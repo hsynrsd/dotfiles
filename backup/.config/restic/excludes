@@ -1,0 +1,33 @@
+# Rebuildable / cache data — not backed up
+/home/hsynrsd/.cache
+/home/hsynrsd/Downloads
+/home/hsynrsd/.local/share/containers
+/home/hsynrsd/.local/share/Steam
+/home/hsynrsd/.local/share/Trash
+/home/hsynrsd/.local/share/fnm
+/home/hsynrsd/.local/share/uv
+/home/hsynrsd/.local/share/claude
+/home/hsynrsd/.local/share/nwjs
+/home/hsynrsd/.local/share/waydroid
+/home/hsynrsd/.steam
+/home/hsynrsd/Games
+/home/hsynrsd/.npm
+/home/hsynrsd/.platformio
+/home/hsynrsd/.nv
+/home/hsynrsd/.vscode/extensions
+/home/hsynrsd/.var/app/com.spotify.Client
+/home/hsynrsd/.var/app/com.usebottles.bottles
+/home/hsynrsd/.var/app/*/cache
+/home/hsynrsd/.config/BraveSoftware/*/*/Cache
+/home/hsynrsd/.config/BraveSoftware/*/*/Code Cache
+/home/hsynrsd/.config/BraveSoftware/*/*/Service Worker/CacheStorage
+/home/hsynrsd/.config/Code/Cache*
+/home/hsynrsd/.config/Code/CachedData
+/home/hsynrsd/.config/Code/logs
+/home/hsynrsd/vms
+/home/hsynrsd/.snapshots
+node_modules
+.venv
+__pycache__
+*.qcow2
+*.iso

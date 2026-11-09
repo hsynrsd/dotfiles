@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Back up $HOME with restic to: (1) local disk /mnt/innovation, (2) Cloudflare R2 (off-site).
+# Usage: backup            run backups + prune
+#        backup snapshots  list snapshots in both repos
+#        backup local|r2 <restic args...>   run any restic command on one repo
+set -uo pipefail
+CFG="$HOME/.config/restic"
+export RESTIC_PASSWORD_FILE="$CFG/password"
+LOCAL_REPO="/mnt/innovation/restic-home"
+BUCKET="hsynrsd-backup"
+set -a; source "$CFG/r2.env"; set +a
+R2_ACCOUNT_ID=$(grep -oE "[0-9a-f]{32}" <<<"${R2_ACCOUNT_ID:-}" | head -1)
+R2_REPO="s3:https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${BUCKET}"
+r2_ready() { [[ -n "${R2_ACCOUNT_ID:-}" && -n "${AWS_ACCESS_KEY_ID:-}" && -n "${AWS_SECRET_ACCESS_KEY:-}" ]]; }
+
+run_repo() {  # name repo
+  local name=$1 repo=$2
+  echo "=== [$name] $repo"
+  restic -r "$repo" cat config >/dev/null 2>&1 || restic -r "$repo" init || return 1
+  restic -r "$repo" backup "$HOME" --exclude-file "$CFG/excludes" --exclude-caches \
+    --one-file-system --tag auto || return 1
+  restic -r "$repo" forget --tag auto --keep-daily 7 --keep-weekly 4 --keep-monthly 12 --prune || return 1
+}
+
+case "${1:-run}" in
+  local) shift; exec restic -r "$LOCAL_REPO" "$@" ;;
+  r2)    shift; r2_ready || { echo "R2 not configured in $CFG/r2.env"; exit 1; }; exec restic -r "$R2_REPO" "$@" ;;
+  snapshots) restic -r "$LOCAL_REPO" snapshots; r2_ready && restic -r "$R2_REPO" snapshots ;;
+  run)
+    rc=0
+    if mountpoint -q /mnt/innovation; then run_repo local "$LOCAL_REPO" || rc=1
+    else echo "!! /mnt/innovation not mounted, skipping local"; rc=1; fi
+    if r2_ready; then run_repo r2 "$R2_REPO" || rc=1
+    else echo "!! R2 credentials missing in $CFG/r2.env, skipping off-site"; rc=1; fi
+    if (( rc )); then notify-send -u critical "Backup" "Backup had errors — run: journalctl --user -u backup" 2>/dev/null; fi
+    exit $rc ;;
+  *) echo "usage: backup [run|snapshots|local ...|r2 ...]"; exit 2 ;;
+esac

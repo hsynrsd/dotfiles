@@ -1,8 +1,22 @@
 # dotfiles
 
-My Linux setup: fish shell + starship prompt.
+My Linux setup (Fedora KDE, Wayland), managed with [GNU stow](https://www.gnu.org/software/stow/).
 
 ## Install
+```sh
 sudo dnf install fish starship fzf zoxide bat stow
 git clone git@github.com:hsynrsd/dotfiles.git ~/dotfiles
-cd ~/dotfiles && stow fish starship
+cd ~/dotfiles && ./install.sh        # or just: stow fish starship
+```
+
+## What's in here
+| Package | What |
+|---|---|
+| `fish`, `starship` | Shell + prompt (incl. `copy` function) |
+| `backup` | `backup` — restic to `/mnt/innovation` + Cloudflare R2, daily systemd timer |
+| `copy` | `termcopy` — `copy` copies last command output / piped input / `-c` last command / `-r` re-run |
+| `voicetype` | Meta+Z voice typing: faster-whisper (large-v3-turbo) on GPU, typed via ydotool |
+| `just` | `~/justfile`: `just update`, `just clean`, `just snapshots`, `just backup-status`, … |
+| `system/` | Root setup scripts, keyd config, `95snapboot` dracut module (boot read-only btrfs snapshots from GRUB via tmpfs overlay) |
+
+**Secrets are never committed** (public repo): `~/.config/restic/password` and `r2.env` live in Bitwarden.

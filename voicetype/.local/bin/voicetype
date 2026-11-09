@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Voice typing toggle (bound to Meta+Z):
+#   1st press: start recording   2nd press: stop, transcribe on GPU, type the text.
+# Text is also left in the clipboard. Settings: VOICETYPE_MODEL, VOICETYPE_LANG (e.g. en, tr).
+set -u
+RUN="${XDG_RUNTIME_DIR:-/tmp}/voicetype"; mkdir -p "$RUN"
+WAV="$RUN/rec.wav"; PIDF="$RUN/rec.pid"; NIDF="$RUN/notify.id"; LOG="$RUN/log"
+D="$HOME/.local/share/voicetype"
+export YDOTOOL_SOCKET=/run/ydotoold/socket
+
+notify() {  # notify <text> [timeout-ms]; replaces the previous voicetype notification
+  local id; id=$(cat "$NIDF" 2>/dev/null || echo 0)
+  notify-send -a "Voice typing" -i audio-input-microphone -p -r "${id:-0}" -t "${2:-3000}" "$1" > "$NIDF" 2>/dev/null
+}
+
+if [[ -f $PIDF ]] && kill -0 "$(cat "$PIDF")" 2>/dev/null; then
+  pid=$(cat "$PIDF"); kill -INT "$pid"
+  for _ in $(seq 50); do kill -0 "$pid" 2>/dev/null || break; sleep 0.05; done
+  rm -f "$PIDF"
+  notify "Transcribing…" 30000
+  export LD_LIBRARY_PATH; LD_LIBRARY_PATH=$(ls -d "$D"/venv/lib/python3*/site-packages/nvidia/*/lib 2>/dev/null | paste -sd:)
+  text=$("$D/venv/bin/python" "$D/transcribe.py" "$WAV" 2>>"$LOG")
+  if [[ -z ${text// } ]]; then notify "Didn't catch anything"; exit 0; fi
+  printf %s "$text" | wl-copy
+  if [[ $text == *[![:ascii:]]* ]]; then
+    ydotool key 29:1 47:1 47:0 29:0           # non-ASCII (ç ş ğ é …): paste with Ctrl+V
+  else
+    printf %s "$text" | ydotool type -d 3 -f -
+  fi
+  notify "✓ ${text:0:80}" 2000
+else
+  rm -f "$WAV"
+  pw-record --rate 16000 --channels 1 --format s16 "$WAV" & echo $! > "$PIDF"
+  notify "🎙 Listening… press Meta+Z again to stop" 0
+fi

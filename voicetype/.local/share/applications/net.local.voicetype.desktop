@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Voice typing
+Comment=Toggle voice typing (Whisper)
+Exec=/home/hsynrsd/.local/bin/voicetype
+Icon=audio-input-microphone
+NoDisplay=true
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true

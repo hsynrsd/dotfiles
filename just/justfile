@@ -1,0 +1,48 @@
+# Personal system commands. Run `just` (from anywhere under ~) to list them.
+# Lives in ~/dotfiles/just/justfile, symlinked to ~/justfile by stow.
+
+# list commands
+default:
+    @just --list --unsorted --justfile {{justfile()}}
+
+# update everything: dnf (auto-snapshotted), flatpaks, uv tools, firmware check
+update:
+    @echo "── dnf ──────────────────────────────"
+    sudo dnf upgrade --refresh -y
+    @echo "── flatpak ──────────────────────────"
+    flatpak update -y
+    flatpak uninstall --unused -y
+    @echo "── uv tools ─────────────────────────"
+    -uv tool upgrade --all
+    @echo "── firmware ─────────────────────────"
+    -fwupdmgr refresh --force >/dev/null
+    -fwupdmgr get-updates
+    @echo "── done. Firmware updates (if any) install with: just firmware"
+    @if [ -f /var/run/reboot-required ] || [ "$(rpm -q --last kernel-core | head -1 | awk '{print $1}' | sed 's/kernel-core-//')" != "$(uname -r)" ]; then echo "⚠ New kernel installed — reboot to use it."; fi
+
+# install pending firmware updates
+firmware:
+    fwupdmgr update
+
+# free disk space: unused packages, flatpak runtimes, old logs, dangling podman images
+clean:
+    sudo dnf autoremove -y
+    sudo dnf clean packages
+    flatpak uninstall --unused -y
+    sudo journalctl --vacuum-time=4weeks
+    -podman image prune -f
+    @df -h / /home | tail -n +2
+
+# list system snapshots (newest last)
+snapshots:
+    sudo snapper -c root list | tail -15
+
+# run a backup now (local + R2) and show snapshots
+backup:
+    backup
+    backup snapshots
+
+# show when backups last ran and their result
+backup-status:
+    systemctl --user list-timers backup.timer --no-pager
+    journalctl --user -u backup.service -n 15 --no-pager -o cat

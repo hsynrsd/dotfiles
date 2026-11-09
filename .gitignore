@@ -1,0 +1,8 @@
+# Never commit secrets (this repo is PUBLIC)
+**/r2.env
+**/restic/password
+*.env
+*.key
+*.pem
+.ssh/
+fish/.config/fish/fish_variables
