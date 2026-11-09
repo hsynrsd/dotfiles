@@ -19,9 +19,14 @@ if [[ -f $PIDF ]] && kill -0 "$(cat "$PIDF")" 2>/dev/null; then
   rm -f "$PIDF"
   notify "Transcribing…" 30000
   export LD_LIBRARY_PATH; LD_LIBRARY_PATH=$(ls -d "$D"/venv/lib/python3*/site-packages/nvidia/*/lib 2>/dev/null | paste -sd:)
-  text=$("$D/venv/bin/python" "$D/transcribe.py" "$WAV" 2>>"$LOG")
-  if [[ -z ${text// } ]]; then notify "Didn't catch anything"; exit 0; fi
+  if [[ $(stat -c %s "$WAV" 2>/dev/null || echo 0) -lt 16000 ]]; then notify "Too short — hold on a bit longer"; exit 0; fi
+  if ! text=$("$D/venv/bin/python" "$D/transcribe.py" "$WAV" 2>>"$LOG"); then
+    notify "Voice typing failed: $(tail -1 "$LOG")" 6000; exit 1
+  fi
+  if [[ -z ${text// } ]]; then notify "Didn't catch anything — speak up or move closer to the mic"; exit 0; fi
   printf %s "$text" | wl-copy
+  # Release any modifiers still held (e.g. Windows key from the shortcut) so typing isn't read as shortcuts
+  ydotool key 125:0 126:0 29:0 97:0 42:0 54:0 56:0 100:0
   if [[ $text == *[![:ascii:]]* ]]; then
     ydotool key 29:1 47:1 47:0 29:0           # non-ASCII (ç ş ğ é …): paste with Ctrl+V
   else
