@@ -8,9 +8,11 @@ WAV="$RUN/rec.wav"; PIDF="$RUN/rec.pid"; NIDF="$RUN/notify.id"; LOG="$RUN/log"
 D="$HOME/.local/share/voicetype"
 export YDOTOOL_SOCKET=/run/ydotoold/socket
 
-notify() {  # notify <text> [timeout-ms]; replaces the previous voicetype notification
-  local id; id=$(cat "$NIDF" 2>/dev/null || echo 0)
-  notify-send -a "Voice typing" -i audio-input-microphone -p -r "${id:-0}" -t "${2:-3000}" "$1" > "$NIDF" 2>/dev/null
+notify() {  # notify <text> [timeout-ms] [new]; updates the current voicetype notification
+  # Plasma silently drops a "replace" of a notification that already closed, so the first
+  # notification of each use ("Listening") is always new; later ones replace it while it's open.
+  local r=(); [[ ${3:-} != new && -s $NIDF ]] && r=(-r "$(cat "$NIDF")")
+  notify-send -a "Voice typing" -i audio-input-microphone -p "${r[@]}" -t "${2:-3000}" "$1" > "$NIDF" 2>/dev/null
 }
 
 if [[ -f $PIDF ]] && kill -0 "$(cat "$PIDF")" 2>/dev/null; then
@@ -36,5 +38,5 @@ if [[ -f $PIDF ]] && kill -0 "$(cat "$PIDF")" 2>/dev/null; then
 else
   rm -f "$WAV"
   pw-record --rate 16000 --channels 1 --format s16 "$WAV" & echo $! > "$PIDF"
-  notify "🎙 Listening… press Meta+Z again to stop" 0
+  notify "🎙 Listening… press Windows+Z again to stop" 0 new
 fi
