@@ -27,6 +27,7 @@ if [ ! -d ~/.local/share/kwin/scripts/krohnkite ]; then
   kpackagetool6 --type=KWin/Script -i "$tmp/krohnkite.kwinscript"; rm -rf "$tmp"
 fi
 kwriteconfig6 --file kwinrc --group Plugins --key krohnkiteEnabled true
+kwriteconfig6 --file kwinrc --group Script-krohnkite --key tiledWindowsLayer 1  # normal layer, not keep-below (fullscreen/taskbar fix)
 echo "✓ krohnkite"
 
 systemctl --user daemon-reload
