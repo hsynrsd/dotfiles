@@ -91,6 +91,7 @@ qdbus-qt6 org.kde.KWin /KWin reconfigure 2>/dev/null || true
 qdbus-qt6 org.kde.plasmashell /PlasmaShell evaluateScript "$(cat desktop-widgets.js)"
 
 ./extras.sh
+./gtk.sh
 kwriteconfig6 --file kdeglobals --group Sounds --key Theme ocean   # steel sounds (sounds/build.sh) dropped: too synthetic
 systemctl --user restart plasma-plasmashell
 echo "✓ Theme applied. Open a new Konsole window; log out/in once so every app picks up the fonts."

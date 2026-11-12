@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Next wallpaper
+Comment=Steel wallpaper playlist (wallrot next)
+Exec=/home/hsynrsd/.local/bin/wallrot next
+Icon=go-next
+NoDisplay=true
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true

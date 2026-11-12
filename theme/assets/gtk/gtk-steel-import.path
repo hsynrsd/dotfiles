@@ -1,0 +1,8 @@
+[Unit]
+Description=Watch gtk.css for KDE rewrites
+
+[Path]
+PathChanged=%h/.config/gtk-4.0/gtk.css
+
+[Install]
+WantedBy=default.target

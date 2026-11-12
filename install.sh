@@ -3,7 +3,7 @@
 # Secrets are NOT in this repo: restore ~/.config/restic/{password,r2.env} from Bitwarden first.
 set -eu
 cd "$(dirname "$0")"
-PKGS="fish starship backup copy voicetype just"
+PKGS="fish starship backup copy voicetype just wallrot"
 
 command -v stow >/dev/null || sudo dnf -y install stow
 stow -t ~ $PKGS
@@ -36,3 +36,12 @@ echo "✓ krohnkite"
 systemctl --user daemon-reload
 systemctl --user enable --now backup.timer
 echo "✓ backup timer (needs ~/.config/restic/password + r2.env)"
+
+# Wallpaper Engine: Steel playlist (dark/cool/muted wallpapers), Meta+Alt+W next, Meta+Alt+Shift+W ban
+kbuildsycoca6 >/dev/null 2>&1 || true
+kwriteconfig6 --file kglobalshortcutsrc --group services --group net.local.wallrot-next.desktop --key _launch "Meta+Alt+W"
+kwriteconfig6 --file kglobalshortcutsrc --group services --group net.local.wallrot-ban.desktop --key _launch "Meta+Alt+Shift+W"
+~/.local/bin/wallrot scan || echo "wallrot: run 'wallrot scan' once Wallpaper Engine wallpapers are installed"
+
+# VS Code: Steel color theme
+./vscode-theme/install.sh

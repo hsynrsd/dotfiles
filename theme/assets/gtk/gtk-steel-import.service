@@ -1,0 +1,6 @@
+[Unit]
+Description=Re-add Steel libadwaita colors to gtk.css
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/gtk-steel-import

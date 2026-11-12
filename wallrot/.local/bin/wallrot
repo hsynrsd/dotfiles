@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""wallrot: keep a Wallpaper Engine playlist of wallpapers that fit the Steel look.
+
+  wallrot scan [--show N]   score every workshop wallpaper's preview, rebuild the "Steel" playlist
+  wallrot next              skip to the next wallpaper in the playlist
+  wallrot ban               never show the current wallpaper again, then skip
+  wallrot keep              force-include the current wallpaper even if it scores low
+  wallrot status            what's on now + playlist size
+
+Steel = dark, cool (blue/teal/slate), muted. Pink/purple/warm-saturated previews are penalised.
+"""
+import colorsys, json, os, re, subprocess, sys, time, uuid
+from pathlib import Path
+from PIL import Image, ImageSequence
+
+APPLETS = Path.home() / ".config/plasma-org.kde.plasma.desktop-appletsrc"
+PLAYLISTS = Path.home() / ".config/wekde/playlists.json"
+STATE = Path.home() / ".config/wallrot.json"         # bans / keeps / threshold / interval
+CACHE = Path.home() / ".cache/wallrot-scores.json"
+PLUGIN = "com.github.captsilver.wallpaperEngineKde"
+NAME = "Steel"
+DBUS = ["qdbus-qt6", "com.github.captsilver.WallpaperEngine", "/WallpaperEngine"]
+
+def state():
+    d = {"ban": [], "keep": [], "threshold": 0.65, "interval_min": 30, "everyone_only": True}
+    try: d.update(json.loads(STATE.read_text()))
+    except Exception: pass
+    return d
+
+def save_state(d): STATE.write_text(json.dumps(d, indent=2) + "\n")
+
+def workshop_dir():
+    m = re.search(r"SteamLibraryPath(?:\[\$e\])?=(?:file://)?(.+)", APPLETS.read_text())
+    lib = Path(m.group(1).strip()) if m else Path.home() / ".local/share/Steam"
+    return lib / "steamapps/workshop/content/431960"
+
+def score_image(path):
+    im = Image.open(path)
+    if getattr(im, "is_animated", False):
+        im = next(ImageSequence.Iterator(im))
+    im = im.convert("RGB").resize((48, 48))
+    n = cool = warm = 0; lum = sat = 0.0
+    px = im.get_flattened_data() if hasattr(im, "get_flattened_data") else im.getdata()
+    for r, g, b in px:
+        h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+        n += 1; lum += v; sat += s
+        deg = h * 360
+        if s > 0.12 and v > 0.12:
+            w = s * v
+            if 170 <= deg <= 245: cool += w            # teal → blue
+            elif deg >= 265 or deg <= 45: warm += w * (1.6 if deg >= 265 else 1)  # purple/pink/red/orange
+    lum /= n; sat /= n; cool /= n; warm /= n
+    dark = max(0.0, 1 - abs(lum - 0.28) / 0.45)       # best around fairly dark
+    muted = max(0.0, 1 - max(0.0, sat - 0.30) / 0.5)  # saturation above ~0.3 costs
+    hue = max(0.0, min(1.0, 0.5 + 3 * (cool - warm)))
+    return round(0.35 * dark + 0.25 * muted + 0.40 * hue, 3)
+
+def scan():
+    cache = {}
+    try: cache = json.loads(CACHE.read_text())
+    except Exception: pass
+    out = {}
+    for d in sorted(workshop_dir().iterdir()):
+        pj = d / "project.json"
+        if not pj.is_file(): continue
+        try: p = json.loads(pj.read_text(encoding="utf-8-sig"))
+        except Exception: continue
+        prev = d / str(p.get("preview", ""))
+        key = f"{d.name}:{prev.stat().st_mtime if prev.is_file() else 0}"
+        sc = cache.get(d.name, {}).get("key") == key and cache[d.name]["score"]
+        if sc is False or sc is None:
+            try: sc = score_image(prev) if prev.is_file() else 0.0
+            except Exception: sc = 0.0
+        out[d.name] = {"key": key, "score": sc, "title": p.get("title", "?"),
+                       "type": str(p.get("type", "")).lower(),
+                       "rating": p.get("contentrating", "Everyone")}
+    CACHE.parent.mkdir(parents=True, exist_ok=True)
+    CACHE.write_text(json.dumps(out))
+    return out
+
+def pick(scores, st):
+    ids = [i for i, s in scores.items()
+           if i not in st["ban"]
+           and (i in st["keep"] or s["score"] >= st["threshold"])
+           and (not st["everyone_only"] or s["rating"] == "Everyone" or i in st["keep"])]
+    return sorted(ids, key=lambda i: -scores[i]["score"])
+
+def dbus(*a):
+    r = subprocess.run(DBUS + list(a), capture_output=True, text=True)
+    return r.stdout.strip() if r.returncode == 0 else None
+
+def plasma_js(js):
+    subprocess.run(["qdbus-qt6", "org.kde.plasmashell", "/PlasmaShell", "evaluateScript", js],
+                   capture_output=True, text=True)
+
+def write_playlist(ids, st):
+    try: data = json.loads(PLAYLISTS.read_text())
+    except Exception: data = {"playlists": [], "version": 1}
+    pl = next((p for p in data["playlists"] if p.get("name") == NAME), None)
+    if pl is None:
+        pl = {"id": str(uuid.uuid4()), "name": NAME, "created": int(time.time())}
+        data["playlists"].append(pl)
+    pl.update(mode="shuffle", interval_min=st["interval_min"],
+              items=[{"workshop_id": i} for i in ids])
+    PLAYLISTS.parent.mkdir(parents=True, exist_ok=True)
+    tmp = PLAYLISTS.with_suffix(".tmp"); tmp.write_text(json.dumps(data, indent=4, ensure_ascii=False) + "\n")
+    tmp.replace(PLAYLISTS)
+    # tell the running plugin to re-read playlists.json, then make Steel the active one
+    # (the plugin's D-Bus ActivatePlaylist is broken: QString/QVariant signature mismatch,
+    #  so set ActivePlaylistId in its config, which the runtime watches)
+    plasma_js(f"""desktops().forEach(function(d){{ if (d.wallpaperPlugin !== "{PLUGIN}") return;
+      d.currentConfigGroup = ["Wallpaper","{PLUGIN}","General"];
+      d.writeConfig("PlaylistsReloadSeq", (parseInt(d.readConfig("PlaylistsReloadSeq")) || 0) + 1);
+      d.writeConfig("ActivePlaylistId", "{pl["id"]}"); }});""")
+    time.sleep(1.5)
+    return pl["id"]
+
+def current():
+    return dbus("CurrentWorkshopId") or ""
+
+def title(i, scores):
+    return scores.get(i, {}).get("title", i)
+
+def notify(msg):
+    subprocess.run(["notify-send", "-a", "Wallpaper", "-i", "preferences-desktop-wallpaper", "-t", "2500", msg])
+
+def main():
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
+    st = state()
+    if cmd == "scan":
+        sc = scan(); ids = pick(sc, st)
+        pid = write_playlist(ids, st)
+        print(f"Steel playlist: {len(ids)} of {len(sc)} wallpapers (threshold {st['threshold']}, every {st['interval_min']} min)")
+        if "--show" in sys.argv:
+            n = int(sys.argv[sys.argv.index("--show") + 1])
+            for i in sorted(sc, key=lambda i: -sc[i]["score"])[:n]:
+                print(f'  {sc[i]["score"]:.2f} {"✓" if i in ids else " "} {sc[i]["title"][:70]}')
+        active = dbus("CurrentPlaylistId")
+        if active != pid: print(f"! plugin reports active playlist {active!r}, expected {pid}")
+    elif cmd == "next":
+        dbus("Next")
+    elif cmd in ("ban", "keep"):
+        cur = current()
+        if not cur: sys.exit("no current wallpaper reported by the plugin")
+        other = "keep" if cmd == "ban" else "ban"
+        if cur in st[other]: st[other].remove(cur)
+        if cur not in st[cmd]: st[cmd].append(cur)
+        save_state(st)
+        sc = scan(); write_playlist(pick(sc, st), st)
+        notify(("Banned: " if cmd == "ban" else "Kept: ") + title(cur, sc))
+        if cmd == "ban": dbus("Next")
+    elif cmd == "status":
+        sc = {}
+        try: sc = json.loads(CACHE.read_text())
+        except Exception: pass
+        cur = current()
+        print(f"now:      {title(cur, sc)} ({cur}, score {sc.get(cur, {}).get('score', '?')})")
+        print(f"playlist: {dbus('CurrentPlaylistId')}  pool {len(pick(sc, st)) if sc else '?'}  banned {len(st['ban'])}  kept {len(st['keep'])}")
+    else:
+        print(__doc__); sys.exit(1)
+
+if __name__ == "__main__":
+    main()

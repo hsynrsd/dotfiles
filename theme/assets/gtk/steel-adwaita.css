@@ -1,0 +1,42 @@
+/* libadwaita colors mapped onto the Breeze colors KDE generates from the Plasma scheme,
+   so GTK4/libadwaita apps (Flatseal, Bottles, EasyEffects…) follow CatppuccinMochaSteel. */
+@define-color accent_color #7aa2f7;
+@define-color accent_bg_color #3d5a8f;
+@define-color accent_fg_color #e6ebf7;
+@define-color destructive_color #e06c75;
+@define-color destructive_bg_color #8a3f47;
+@define-color destructive_fg_color #f2dfe1;
+@define-color success_color #8fbf9f;
+@define-color success_bg_color #3f6b52;
+@define-color warning_color #d8a657;
+@define-color warning_bg_color #7a5f30;
+@define-color error_color #e06c75;
+@define-color error_bg_color #8a3f47;
+
+@define-color window_bg_color @theme_bg_color_breeze;
+@define-color window_fg_color @theme_fg_color_breeze;
+@define-color view_bg_color @theme_base_color_breeze;
+@define-color view_fg_color @theme_text_color_breeze;
+@define-color headerbar_bg_color @theme_header_background_breeze;
+@define-color headerbar_fg_color @theme_header_foreground_breeze;
+@define-color headerbar_backdrop_color @theme_header_background_backdrop_breeze;
+@define-color headerbar_border_color @borders_breeze;
+@define-color headerbar_shade_color rgba(0, 0, 0, 0.36);
+@define-color sidebar_bg_color #1a1a28;
+@define-color sidebar_fg_color @theme_fg_color_breeze;
+@define-color sidebar_backdrop_color #1c1c2a;
+@define-color sidebar_shade_color rgba(0, 0, 0, 0.25);
+@define-color secondary_sidebar_bg_color #1c1c2b;
+@define-color secondary_sidebar_fg_color @theme_fg_color_breeze;
+@define-color card_bg_color rgba(122, 162, 247, 0.05);
+@define-color card_fg_color @theme_fg_color_breeze;
+@define-color card_shade_color rgba(0, 0, 0, 0.36);
+@define-color dialog_bg_color #24243a;
+@define-color dialog_fg_color @theme_fg_color_breeze;
+@define-color popover_bg_color #24243a;
+@define-color popover_fg_color @theme_fg_color_breeze;
+@define-color popover_shade_color rgba(0, 0, 0, 0.25);
+@define-color thumbnail_bg_color #24243a;
+@define-color thumbnail_fg_color @theme_fg_color_breeze;
+@define-color shade_color rgba(0, 0, 0, 0.25);
+@define-color scrollbar_outline_color rgba(0, 0, 0, 0.5);

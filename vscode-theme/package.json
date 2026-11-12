@@ -1,0 +1,12 @@
+{
+  "name": "steel-theme",
+  "displayName": "Steel",
+  "description": "Dark muted steel-blue theme matching the desktop",
+  "version": "1.0.0",
+  "publisher": "hsynrsd",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Themes"],
+  "contributes": {
+    "themes": [{ "label": "Steel", "uiTheme": "vs-dark", "path": "./themes/steel.json" }]
+  }
+}

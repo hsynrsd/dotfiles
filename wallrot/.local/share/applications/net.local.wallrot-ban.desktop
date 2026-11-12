@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Ban this wallpaper
+Comment=Steel wallpaper playlist (wallrot ban)
+Exec=/home/hsynrsd/.local/bin/wallrot ban
+Icon=edit-delete
+NoDisplay=true
+StartupNotify=false
+X-KDE-GlobalAccel-CommandShortcut=true
