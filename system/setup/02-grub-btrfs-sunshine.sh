@@ -45,8 +45,8 @@ GRUB_BTRFS_SCRIPT_CHECK=grub2-script-check
 GRUB_BTRFS_SNAPSHOT_KERNEL_PARAMETERS="enforcing=0"
 EOF
 fi
-# Always show the GRUB menu (Fedora hides it by default)
-grub2-editenv - unset menu_auto_hide
+# Menu visibility: see 06-quiet-boot.sh (hidden, Shift to show)
+grub2-editenv - set menu_auto_hide=1
 
 step "Baseline snapshot + regenerate GRUB menu"
 snapper -c root create --cleanup-algorithm number --description "baseline (grub-btrfs setup)"
