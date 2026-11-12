@@ -35,7 +35,7 @@ if command -v keyd >/dev/null; then
 *
 
 [main]
-capslock = overload(control, esc)
+# capslock = overload(control, esc)  # disabled: want real CapsLock
 EOF
   systemctl enable --now keyd && keyd reload || fail+=("keyd service")
 fi

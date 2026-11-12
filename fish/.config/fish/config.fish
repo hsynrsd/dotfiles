@@ -16,13 +16,23 @@ end
 
 if status is-interactive
     set -g fish_greeting
+    fish_config theme choose catppuccin-mocha
+
+    # System info when a new Konsole window/tab opens (not in nested shells, VS Code, etc.)
+    if set -q KONSOLE_VERSION; and not set -q __fetched; and type -q fastfetch
+        set -gx __fetched 1
+        fastfetch
+    end
 
     # ── Tools ────────────────────────────────────────
     type -q starship; and starship init fish | source
 
     if type -q fzf
         fzf --fish | source
-        set -gx FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border --info=inline'
+        set -gx FZF_DEFAULT_OPTS '--height 40% --layout=reverse --border=rounded --info=inline' \
+            '--color=bg+:#313244,bg:-1,spinner:#7aa2f7,hl:#73b8c9,fg:#cdd6f4,header:#73b8c9' \
+            '--color=info:#7aa2f7,pointer:#7aa2f7,marker:#73b8c9,fg+:#cdd6f4,prompt:#7aa2f7' \
+            '--color=hl+:#73b8c9,selected-bg:#45475a,border:#6c7086,label:#cdd6f4'
         if type -q fd
             set -gx FZF_DEFAULT_COMMAND 'fd --type f --hidden --exclude .git'
             set -gx FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND
@@ -69,6 +79,30 @@ if status is-interactive
         mkdir -p -- $argv[1]; and cd -- $argv[1]
     end
 
+    # ── Handy tools ──────────────────────────────────
+    type -q lazygit;   and abbr -a lg lazygit
+    type -q btop;      and abbr -a top btop
+    type -q fastfetch; and abbr -a fetch fastfetch
+    type -q tldr;      and abbr -a eg tldr          # eg tar → short examples
+    abbr -a ports 'ss -tulpn'
+    abbr -a myip 'curl -s ifconfig.me; echo'
+    abbr -a df 'df -h -x tmpfs -x devtmpfs -x efivarfs'
+    abbr -a du 'du -sh'
+    function extract -d "Unpack any archive"
+        switch $argv[1]
+            case '*.tar.gz' '*.tgz';  tar xzf $argv[1]
+            case '*.tar.xz' '*.txz';  tar xJf $argv[1]
+            case '*.tar.zst';         tar --zstd -xf $argv[1]
+            case '*.tar.bz2';         tar xjf $argv[1]
+            case '*.tar';             tar xf $argv[1]
+            case '*.zip';             unzip $argv[1]
+            case '*.7z';              7z x $argv[1]
+            case '*.rar';             unrar x $argv[1]
+            case '*.gz';              gunzip $argv[1]
+            case '*';                 echo "don't know how to extract $argv[1]"
+        end
+    end
+
     # ── System / dev ─────────────────────────────────
     abbr -a up   'sudo dnf upgrade --refresh'
     abbr -a dnfi 'sudo dnf install'
@@ -81,3 +115,5 @@ if status is-interactive
     type -q zoxide; and zoxide init fish | source
 end
 
+
+fish_add_path /home/hsynrsd/.spicetify

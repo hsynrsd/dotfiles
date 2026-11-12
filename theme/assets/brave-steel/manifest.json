@@ -1,0 +1,103 @@
+{
+  "manifest_version": 3,
+  "name": "Steel",
+  "version": "1.2",
+  "description": "Dark muted steel-blue theme (matches the desktop and terminal).",
+  "theme": {
+    "colors": {
+      "frame": [
+        22,
+        25,
+        38
+      ],
+      "frame_inactive": [
+        26,
+        29,
+        43
+      ],
+      "frame_incognito": [
+        17,
+        19,
+        30
+      ],
+      "frame_incognito_inactive": [
+        17,
+        19,
+        30
+      ],
+      "toolbar": [
+        40,
+        46,
+        68
+      ],
+      "toolbar_text": [
+        192,
+        202,
+        245
+      ],
+      "toolbar_button_icon": [
+        122,
+        162,
+        247
+      ],
+      "tab_text": [
+        255,
+        255,
+        255
+      ],
+      "tab_background_text": [
+        255,
+        255,
+        255
+      ],
+      "tab_background_text_inactive": [
+        255,
+        255,
+        255
+      ],
+      "bookmark_text": [
+        180,
+        188,
+        223
+      ],
+      "omnibox_background": [
+        29,
+        33,
+        50
+      ],
+      "omnibox_text": [
+        192,
+        202,
+        245
+      ],
+      "ntp_background": [
+        23,
+        26,
+        40
+      ],
+      "ntp_text": [
+        169,
+        177,
+        214
+      ],
+      "ntp_link": [
+        122,
+        162,
+        247
+      ],
+      "ntp_header": [
+        59,
+        66,
+        97
+      ],
+      "tab_text_inactive": [
+        255,
+        255,
+        255
+      ]
+    },
+    "properties": {
+      "ntp_background_alignment": "bottom"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Steel Net
+Description=Your PC coming online: network links light up steel blue as Fedora boots.
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/steel-net
+ScriptFile=/usr/share/plymouth/themes/steel-net/steel-net.script

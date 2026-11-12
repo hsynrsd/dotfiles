@@ -30,6 +30,9 @@ kwriteconfig6 --file kwinrc --group Plugins --key krohnkiteEnabled true
 kwriteconfig6 --file kwinrc --group Script-krohnkite --key tiledWindowsLayer 1  # normal layer, not keep-below (fullscreen/taskbar fix)
 echo "✓ krohnkite"
 
+# Look: Catppuccin Mocha everywhere
+./theme/apply.sh
+
 systemctl --user daemon-reload
 systemctl --user enable --now backup.timer
 echo "✓ backup timer (needs ~/.config/restic/password + r2.env)"
