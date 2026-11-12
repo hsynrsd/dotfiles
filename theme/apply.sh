@@ -27,8 +27,8 @@ kwriteconfig6 --file kscreenlockerrc --group Greeter --group Wallpaper --group o
 kwriteconfig6 --file kwinrc --group Plugins --key blurEnabled true
 kwriteconfig6 --file kwinrc --group Effect-blur --key BlurStrength 10
 kwriteconfig6 --file kwinrc --group Effect-blur --key NoiseStrength 3
-kwriteconfig6 --file kwinrc --group Plugins --key magiclampEnabled true
-kwriteconfig6 --file kwinrc --group Plugins --key squashEnabled false
+kwriteconfig6 --file kwinrc --group Plugins --key magiclampEnabled false
+kwriteconfig6 --file kwinrc --group Plugins --key squashEnabled true
 kwriteconfig6 --file kwinrc --group Windows --key Placement Centered
 # Breeze title bars: no outline, slightly bigger buttons
 kwriteconfig6 --file breezerc --group Common --key OutlineIntensity OutlineOff
@@ -91,6 +91,6 @@ qdbus-qt6 org.kde.KWin /KWin reconfigure 2>/dev/null || true
 qdbus-qt6 org.kde.plasmashell /PlasmaShell evaluateScript "$(cat desktop-widgets.js)"
 
 ./extras.sh
-./sounds/build.sh
+kwriteconfig6 --file kdeglobals --group Sounds --key Theme ocean   # steel sounds (sounds/build.sh) dropped: too synthetic
 systemctl --user restart plasma-plasmashell
 echo "✓ Theme applied. Open a new Konsole window; log out/in once so every app picks up the fonts."
