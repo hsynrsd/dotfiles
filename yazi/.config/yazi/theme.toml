@@ -36,6 +36,6 @@ rules = [
   { mime = "image/*", fg = "#73b8c9" },
   { mime = "{audio,video}/*", fg = "#d8a657" },
   { mime = "application/{zip,gzip,x-tar,x-7z-compressed,x-xz,zstd}", fg = "#e06c75" },
-  { name = "*/", fg = "#7aa2f7" },
-  { name = "*", fg = "#a9b1d6" },
+  { url = "*/", fg = "#7aa2f7" },
+  { url = "*", fg = "#a9b1d6" },
 ]
