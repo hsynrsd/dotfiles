@@ -6,3 +6,4 @@
 *.pem
 .ssh/
 fish/.config/fish/fish_variables
+espanso/.config/espanso/match/private.yml

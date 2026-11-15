@@ -1,0 +1,41 @@
+# Steel theme for yazi (matches lazygit/btop palette)
+[mgr]
+cwd             = { fg = "#73b8c9" }
+hovered         = { fg = "#a9b1d6", bg = "#2f354d", bold = true }
+preview_hovered = { bg = "#262b3f" }
+find_keyword    = { fg = "#d8a657", bold = true }
+find_position   = { fg = "#7aa2f7" }
+marker_selected = { fg = "#7aa2f7", bg = "#7aa2f7" }
+marker_copied   = { fg = "#73b8c9", bg = "#73b8c9" }
+marker_cut      = { fg = "#e06c75", bg = "#e06c75" }
+tab_active      = { fg = "#1a1b26", bg = "#7aa2f7" }
+tab_inactive    = { fg = "#a9b1d6", bg = "#2f354d" }
+border_symbol   = "│"
+border_style    = { fg = "#3b4261" }
+
+[mode]
+normal_main   = { fg = "#1a1b26", bg = "#7aa2f7", bold = true }
+normal_alt    = { fg = "#7aa2f7", bg = "#2f354d" }
+select_main   = { fg = "#1a1b26", bg = "#73b8c9", bold = true }
+select_alt    = { fg = "#73b8c9", bg = "#2f354d" }
+unset_main    = { fg = "#1a1b26", bg = "#d8a657", bold = true }
+unset_alt     = { fg = "#d8a657", bg = "#2f354d" }
+
+[status]
+perm_type  = { fg = "#7aa2f7" }
+perm_read  = { fg = "#73b8c9" }
+perm_write = { fg = "#d8a657" }
+perm_exec  = { fg = "#e06c75" }
+perm_sep   = { fg = "#3b4261" }
+progress_label  = { fg = "#a9b1d6", bold = true }
+progress_normal = { fg = "#7aa2f7", bg = "#262b3f" }
+progress_error  = { fg = "#e06c75", bg = "#262b3f" }
+
+[filetype]
+rules = [
+  { mime = "image/*", fg = "#73b8c9" },
+  { mime = "{audio,video}/*", fg = "#d8a657" },
+  { mime = "application/{zip,gzip,x-tar,x-7z-compressed,x-xz,zstd}", fg = "#e06c75" },
+  { name = "*/", fg = "#7aa2f7" },
+  { name = "*", fg = "#a9b1d6" },
+]

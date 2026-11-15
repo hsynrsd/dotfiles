@@ -1,0 +1,23 @@
+# Type the trigger anywhere and it expands. Add your own below.
+# Private ones (email, address, phone) go in ~/.config/espanso/match/private.yml — NOT in this repo.
+matches:
+  - trigger: ":date"
+    replace: "{{d}}"
+    vars: [{ name: d, type: date, params: { format: "%Y-%m-%d" } }]
+  - trigger: ":time"
+    replace: "{{t}}"
+    vars: [{ name: t, type: date, params: { format: "%H:%M" } }]
+  - trigger: ":now"
+    replace: "{{n}}"
+    vars: [{ name: n, type: date, params: { format: "%Y-%m-%d %H:%M" } }]
+  - trigger: ":shrug"
+    replace: "¯\\_(ツ)_/¯"
+  - trigger: ":arrow"
+    replace: "→"
+  - trigger: ":check"
+    replace: "✓"
+  - trigger: ":ty"
+    replace: "Thank you!"
+  - trigger: ":clip"
+    replace: "{{c}}"
+    vars: [{ name: c, type: clipboard }]

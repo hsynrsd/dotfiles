@@ -3,7 +3,7 @@
 # Secrets are NOT in this repo: restore ~/.config/restic/{password,r2.env} from Bitwarden first.
 set -eu
 cd "$(dirname "$0")"
-PKGS="fish starship backup copy voicetype just wallrot"
+PKGS="fish starship backup copy voicetype just wallrot yazi espanso"
 
 command -v stow >/dev/null || sudo dnf -y install stow
 stow -t ~ $PKGS

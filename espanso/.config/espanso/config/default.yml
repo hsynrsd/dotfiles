@@ -1,0 +1,3 @@
+# Alt+Space is KRunner, so the espanso search bar uses Alt+Shift+Space
+search_shortcut: ALT+SHIFT+SPACE
+show_notifications: false
