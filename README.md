@@ -15,7 +15,6 @@ cd ~/dotfiles && ./install.sh        # or just: stow fish starship
 | `fish`, `starship` | Shell + prompt (incl. `copy` function) |
 | `backup` | `backup` — restic to `/mnt/innovation` + Cloudflare R2, daily systemd timer |
 | `copy` | `termcopy` — `copy` copies last command output / piped input / `-c` last command / `-r` re-run |
-| `voicetype` | Meta+Z voice typing: faster-whisper (large-v3-turbo) on GPU, typed via ydotool |
 | `just` | `~/justfile`: `just update`, `just clean`, `just snapshots`, `just backup-status`, … |
 | `wallrot` | Wallpaper Engine "Steel" playlist: scores previews (dark/cool/muted), Meta+Alt+W next, Meta+Alt+Shift+W ban, `wallrot keep`/`status`/`scan` |
 | `vscode-theme/` | Steel VS Code color theme, packaged + installed by `vscode-theme/install.sh` |

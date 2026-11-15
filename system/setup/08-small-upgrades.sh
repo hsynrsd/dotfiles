@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
-# Small upgrades: yazi (terminal file manager), espanso (text expander, Wayland build),
+# Remove ydotool (voice typing is gone). Small upgrades: yazi (terminal file manager), espanso (text expander, Wayland build),
 # automatic security updates (dnf5-automatic), Waydroid (Android apps).
 # Run with: sudo bash 08-small-upgrades.sh
 set -eu
 [ "$(id -u)" = 0 ] || { echo "run with sudo"; exit 1; }
 U=${SUDO_USER:?run via sudo from your user}
 H=$(getent passwd "$U" | cut -d: -f6)
+
+echo "── remove voice typing leftovers (ydotool) ──"
+systemctl disable --now ydotool.service 2>/dev/null || true
+rm -rf /etc/systemd/system/ydotool.service.d
+dnf -y remove ydotool || true
+systemctl daemon-reload
 
 echo "── yazi ─────────────────────────────"
 dnf -y copr enable lihaohong/yazi
